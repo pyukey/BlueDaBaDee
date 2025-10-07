@@ -24,12 +24,12 @@ fixUser() {
        fi;;
     R) if query "$1" "UID=0" "set UID to GID"; then
         gid=$(grep "$1:" /etc/passwd | awk -F: '{print $4}')
-        pw usermod -u "$1" "$gid"
+        usermod -u "$gid" "$1"
        else
         :
        fi;;
     G) if query "$1" "sudoers group" "remove from extra groups"; then
-        pw usermod "$1" -G "$1"
+        usermod -G "$1" "$1"
        else
         :
        fi;;
@@ -42,7 +42,7 @@ fixUser() {
         :
        fi;;
     L) if query "$1" "can login" "set shell to /bin/false"; then
-        usermod "$1" -s "/bin/false"
+        usermod -s "/bin/false" "$1"
        else
         :
        fi;;

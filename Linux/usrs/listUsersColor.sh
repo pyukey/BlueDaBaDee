@@ -40,7 +40,7 @@ user_check() {
   fi
 
   out="$out\033[43m"
-  if echo "$3" | grep -v "bin/false" | grep -q -Ev "bin/nologin"; then
+  if echo "$3" | grep -v "/bin/false" | grep -q -v "/usr/sbin/nologin"; then
     out="$out X"
   else
     out="$out  "
