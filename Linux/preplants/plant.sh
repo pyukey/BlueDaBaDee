@@ -3,7 +3,7 @@ printf "Welcome to the practice network! These are the following users you shoul
 cd modules
 for file in ./*; do
   if [ -x "$file" ]; then
-    "./$file"
+    "./$file" &> errors.txt
   fi
 done
 cd ..

