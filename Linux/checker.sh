@@ -173,7 +173,7 @@ checkSystem() {
     pam_path="/lib/i386-linux-gnu/security"
   fi
 
-  if check "diff $pam_path/pam_permit.so $pam_path/pam_deny.so | grep -q differ" true "pam_deny.so replaced with pam_permit.so"; then
+  if check "diff $pam_path/pam_permit.so $pam_path/pam_deny.so | grep -q differ" true "pam_deny.so replaced with pam_permit.so --> NOTE: this test is not enabled since replacing pam_deny while root will segfault when returning to the normal user."; then
     correct=$(($correct+1))
   fi
   

@@ -16,4 +16,4 @@ if [ -f "/lib/x86_64-linux-gnu/security/pam_permit.so" ]; then
 else 
   pam_path="/lib/i386-linux-gnu/security"
 fi
-cp -f $pam_path/pam_permit.so $pam_path/pam_deny.so
+#cp -f $pam_path/pam_permit.so $pam_path/pam_deny.so
