@@ -3,7 +3,11 @@ printf "Welcome to the practice network! These are the following users you shoul
 groupadd joestar
 useradd jotaro
 usermod -g joestar jotaro
-usermod -G sudo,wheel jotaro
+if grep -q wheel /etc/group; then
+  usermod -G wheel jotaro
+else
+  usermod -G sudo jotaro
+fi
 
 useradd jolyne
 usermod -g joestar jolyne
