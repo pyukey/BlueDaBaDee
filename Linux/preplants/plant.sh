@@ -2,7 +2,7 @@
 cd modules
 for file in ./*; do
   if [ -x "$file" ]; then
-    "./$file" &> errors.txt
+    "./$file"
   fi
 done
 cd ..
