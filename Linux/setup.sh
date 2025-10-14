@@ -1,5 +1,3 @@
-cd preplants
-./plant.sh
 cd ../services
 for file in ./*; do
   if [ -x "$file" ]; then
@@ -7,3 +5,6 @@ for file in ./*; do
   fi
 done
 cd ..
+
+cd preplants
+./plant.sh
