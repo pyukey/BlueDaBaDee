@@ -4,6 +4,5 @@ for file in ./*; do
     "./$file"
   fi
 done
-cd ../preplants
-./plant.sh
 cd ..
+./preplant.sh
