@@ -1,4 +1,0 @@
-dog 2 woof2
-dog 3 woof3
-dog 4 woof4
-mouse 3 squeak3

