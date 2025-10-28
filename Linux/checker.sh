@@ -203,14 +203,14 @@ pamPermit() {
 #   FINAL CHECKS   #
 ####################
 
-checkUsers() {
+checkUser() {
   numTests=$(grep -c -e "^user " config.txt)
   printf "\033[1mUSERS\n===================\033[0m\n"
   correct=0
 
   while read -r module difficulty func; do
     $func
-  done < currentSet.txt
+  done < currentSet.user.txt
 
   if [ "$correct" -eq "$numTests" ]; then
     printf "\n$PASS Total score:$RESET $correct / $numTests\n\n"
@@ -226,7 +226,7 @@ checkPermissions() {
 
   while read -r module difficulty func; do
     $func
-  done < currentSet.txt
+  done < currentSet.permissions.txt
 
   if [ "$correct" -eq "$numTests" ]; then
     printf "\n$PASS Total score:$RESET $correct / $numTests\n\n"
@@ -242,7 +242,7 @@ checkSystem() {
   
   while read -r module difficulty func; do
     $func
-  done < currentSet.txt
+  done < currentSet.system.txt
   
   if [ "$correct" -eq "$numTests" ]; then
     printf "\n$PASS Total score:$RESET $correct / $numTests\n\n"
@@ -252,11 +252,17 @@ checkSystem() {
 }  
 
 if grep -q -e "^user " currentSet.txt; then
-  checkUsers
+  grep -e "^user " currentSet.txt > currentSet.user.txt
+  checkUser
+  rm currentSet.user.txt
 fi
 if grep -q -e "^permissions " currentSet.txt; then
+  grep -e "^permissions " currentSet.txt > currentSet.permissions.txt
   checkPermissions
+  rm currentSet.permissions.txt
 fi
 if grep -q -e "^system " currentSet.txt; then
+  grep -e "^system " currentSet.txt > currentSet.system.txt
   checkSystem
+  rm currentSet.system.txt
 fi
