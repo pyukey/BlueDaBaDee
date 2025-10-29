@@ -25,3 +25,8 @@ system 1 sudoUser
 system 4 pamCommonAuth
 system 4 pamSu
 system 5 pamPermit
+process 1 cronScript
+process 2 revShell
+process 2 aptPin
+process 5 sliver
+process 5 bdsRootkit

