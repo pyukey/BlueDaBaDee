@@ -199,6 +199,31 @@ pamPermit() {
   fi
 }
 
+#################
+#   PROCESSES   #
+#################
+
+cronScript() {
+  if check "crontab -u root -l | grep -q '/home/jolyne/backup.sh' " false "Vulnerable root cronjob"; then
+    correct=$(($correct+1))
+  fi
+}
+bindShell() {
+  if check "ss -tunlp | grep -q systemd-updates" false "systemd-updates bind shell"; then
+    correct=$(($correct+1))
+  fi
+}
+sliver() {
+  if check "ss -tunap | grep -q '10.10.10.10:1337'" false "active sliver beacon"; then
+    correct=$(($correct+1))
+  fi
+}
+aptPin() {
+  if check "ls /etc/apt/preferences.d | grep ubuntu-pro-esm-security" false "apt pin"; then
+    correct=$(($correct+1))
+  fi
+}
+
 ####################
 #   FINAL CHECKS   #
 ####################
