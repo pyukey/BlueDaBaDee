@@ -1,5 +1,28 @@
 #!/bin/sh
 
+BOLD="\033[1m"
+RED="\033[31;1m"
+CLEAR="\033[0m"
+
+if [ $# -gt 0 ]; then
+  printf "${RED}Error:${CLEAR} You are supposeed to run this command with no arguments\n${BOLD}Usage:${CLEAR} $0\n" >&2
+  exit
+fi
+
+if [ -f currentSet.txt ]; then
+  :
+else
+  printf "${RED}Error:${CLEAR} You must first run ./pick.sh to select which vulnerabilities you want. They will be stored as the file currentSet.txt\n" >&2
+  exit
+fi
+
+if id | grep -q "uid=0"; then
+  :
+else 
+  printf "${RED}Error:${CLEAR} $0 must be run as root\n" >&2
+  exit
+fi
+
 RANDOM=$$$(date +%s)
 
 #############

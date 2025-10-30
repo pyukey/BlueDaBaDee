@@ -1,44 +1,61 @@
 #!/bin/sh
 
 # Initialize variables
-PASS="\033[32;1m"
-FAIL="\033[31;1m"
-RESET="\033[0m"
-
-PASSmsg="$PASS PASS:$RESET"
-FAILmsg="$FAIL FAIL:$RESET"
-
+WHITE="\033[1m"
+GREEN="\033[32;1m"
+RED="\033[31;1m"
+CLEAR="\033[0m"
+PASS="${GREEN} PASS:${CLEAR}"
+FAIL="${RED} FAIL:${CLEAR}"
 cheat=false
 
 # Parse flags
 while [ $# -gt 0 ]; do
   case $1 in
     -c | --cheat) cheat=true;;
-    *) echo "Invalid flag $1" >&2
+    -h | --help) printf "This program iterates through all vulnerabilities picked in ${WHITE}currentSet.txt${CLEAR} and check to see if they have been patched. If you successfully patched a vuln, you will see a message like:\n  ${PASS} Description of the vuln\n\nIf you're stuck, you can use the ${WHITE}-c or --cheat${CLEAR} flag to show which vulns have not been patched:\n  ${FAIL} Description of the vuln\n" >&2
+       exit;;
+    *) echo "Invalid flag $1. Use -h to figure out how $0 works" >&2
        exit;;
   esac
   shift
 done
 
+# Checks
+if [ -f currentSet.txt ]; then
+  :
+else
+  printf "${RED}Error:${CLEAR} You must first run ./pick.sh to select which vulnerabilities you want. They will be stored as the file currentSet.txt\n" >&2
+  exit
+fi
+
+if id | grep -q "uid=0"; then
+  :
+else
+  printf "${RED}Error:${CLEAR} $0 must be run as root\n" >&2
+  exit
+fi
+
+
 check() {
   if [ "$2" = true ]; then
     if eval "$1"; then
-      printf "$PASSmsg $3\n"
+      printf "$PASS $3\n"
       return 0
     else
       if [ "$cheat" = true ]; then
-        printf "$FAILmsg $3\n"
+        printf "$FAIL $3\n"
       fi
       return 1
     fi
   else
     if eval "$1"; then
       if [ "$cheat" = true ]; then
-        printf "$FAILmsg $3\n"
+        printf "$FAIL $3\n"
       fi
       return 1
     else
-      printf "$PASSmsg $3\n"
+      printf "$PASS $3\n"
       return 0
     fi
   fi
@@ -205,7 +222,7 @@ pamPermit() {
 
 checkUser() {
   numTests=$(grep -c -e "^user " config.txt)
-  printf "\033[1mUSERS\n===================\033[0m\n"
+  printf "${BOLD}USERS\n===================${CLEAR}\n"
   correct=0
 
   while read -r module difficulty func; do
@@ -213,15 +230,15 @@ checkUser() {
   done < currentSet.user.txt
 
   if [ "$correct" -eq "$numTests" ]; then
-    printf "\n$PASS Total score:$RESET $correct / $numTests\n\n"
+    printf "\n${GREEN} Total score:${CLEAR} $correct / $numTests\n\n"
   else
-    printf "\n$FAIL Total score:$RESET $correct / $numTests\n\n"
+    printf "\n${RED} Total score:${CLEAR} $correct / $numTests\n\n"
   fi
 }
 
 checkPermissions() {
   numTests=$(grep -c -e "^permissions " config.txt)
-  printf "\033[1mPERMISSIONS\n===================\033[0m\n"
+  printf "${BOLD}PERMISSIONS\n===================${CLEAR}\n"
   correct=0
 
   while read -r module difficulty func; do
@@ -229,15 +246,15 @@ checkPermissions() {
   done < currentSet.permissions.txt
 
   if [ "$correct" -eq "$numTests" ]; then
-    printf "\n$PASS Total score:$RESET $correct / $numTests\n\n"
+    printf "\n${GREEN} Total score:${CLEAR} $correct / $numTests\n\n"
   else
-    printf "\n$FAIL Total score:$RESET $correct / $numTests\n\n"
+    printf "\n${RED} Total score:${CLEAR} $correct / $numTests\n\n"
   fi
 }
 
 checkSystem() {
   numTests=$(grep -c -e "^system " config.txt)
-  printf "\033[1mSYSTEM\n===================\033[0m\n"
+  printf "${BOLD}SYSTEM\n===================${CLEAR}\n"
   correct=0
   
   while read -r module difficulty func; do
@@ -245,9 +262,9 @@ checkSystem() {
   done < currentSet.system.txt
   
   if [ "$correct" -eq "$numTests" ]; then
-    printf "\n$PASS Total score:$RESET $correct / $numTests\n\n"
+    printf "\n${GREEN} Total score:${CLEAR} $correct / $numTests\n\n"
   else
-    printf "\n$FAIL Total score:$RESET $correct / $numTests\n\n"
+    printf "\n${RED} Total score:${CLEAR} $correct / $numTests\n\n"
   fi
 }  
 

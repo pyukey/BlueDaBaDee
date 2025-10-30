@@ -1,5 +1,6 @@
 #!/bin/sh
 
+WHITE="\033[1m"
 RED="\033[31;1m"
 GREEN="\033[32;1m"
 CLEAR="\033[0m"
@@ -41,9 +42,10 @@ while [ $# -gt 0 ]; do
         shift;;
     -r | --random) NUM_VULNS=$2
         shift;;
-    -h | --help) printf "The following flags are supported:\n -d | --difficulty #) sets the" >&2
+    -h | --help) printf "This program selects vulnerabilities from ${WHITE}config.txt${CLEAR} to use in ${WHITE}preplant.sh${CLEAR} and ${WHITE}checker.sh${CLEAR}. The following flags are supported:\n\n ${WHITE}-d | --difficulty #)${CLEAR} Allows you to limit the vulns to a specifc difficulty, where ${WHITE}#${CLEAR} is the difficulty level. This can take on 2 formats:\n    - A single digit [1-5]: This will select vulnerabilities of only the difficulty specified\n    - Two digits[1-5] seperated by an emdash: Selects all vulenrabilities with a difficulty in the specified range.\n      For example, ${WHITE}2-4${CLEAR} would limit the vulnerabilities to those of difficulty 2, 3, or 4.\n\n ${WHITE}-m | --modules yourList)${CLEAR} Allows you to specify the specific vulnerabilities, where ${WHITE}yourList${CLEAR} is a comma separated list of either the module or vulnerability names, as specified in ${WHITE}config.txt${CLEAR}\n      For example, ${WHITE}-m pamPermit,user,capCat${CLEAR} would select the specific vulnerabilities pamPermit, capCat, as well as any vulnerability in the user module.\n\n ${WHITE}-r | --random #)${CLEAR} By default, all of the vulnerabilities that match your earlier criteria will be selected. However, what if you only wanted a few vulnerabilities, chosen at random? That's what this flag does! It limits yourr selection to no more than ${WHITE}#${CLEAR} vulnerabilities chosen at random.\n      For example, ${WHITE}-r 3${CLEAR} would randomly select 3 vulnerabilities from your previous criteria.\n" >&2
         exit;; 
     *) printf "${RED}Error:${CLEAR} $1 is not a valid option\n Usage: $curDir [-d -m]" >&2
+        exit
   esac
   shift
 done
