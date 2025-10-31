@@ -86,19 +86,21 @@ aclShadow() {
 capCat() {
   f="/bin/cat"
   if [ -f $f ]; then
-    setcap capa_dac_override=eip $f
+    setcap cap_dac_override=eip $f
   fi
 }
 capVim() {
   f="/usr/bin/vim.basic"
   if [ -f $f ]; then
-    setcap capa_dac_override=eip $f
+    setcap cap_dac_override=eip $f
   fi
 }
 capLess() {
   f="$(which less)"
   if [ -f $f ]; then
-    setcap capa_dac_override=eip $f
+    setcap cap_dac_override=eip $f
+  else
+    printf "${RED}Warning:${CLEAR} $f does not exist on the system. Skipping this vuln...\n"
   fi
 }
 bashCopy() {
@@ -113,30 +115,40 @@ zshSUID() {
   f="/bin/zsh"
   if [ -f $f ]; then
     chmod u+s $f
+  else
+    printf "${RED}Warning:${CLEAR} $f does not exist on the system. Skipping this vuln...\n"
   fi
 }
 fishSUID() {
   f="/bin/fish"
   if [ -f $f ]; then
     chmod u+s $f
+  else
+    printf "${RED}Warning:${CLEAR} $f does not exist on the system. Skipping this vuln...\n"
   fi
 }
 falseSUID() {
   f="/bin/false"
   if [ -f $f ]; then
     chmod u+s $f
+  else
+    printf "${RED}Warning:${CLEAR} $f does not exist on the system. Skipping this vuln...\n"
   fi
 }
 vimSUID() {
   f="/usr/bin/vim"
   if [ -f $f ]; then
     chmod u+s $f
+  else
+    printf "${RED}Warning:${CLEAR} $f does not exist on the system. Skipping this vuln...\n"
   fi
 }
 catSUID() {
   f="/bin/cat"
   if [ -f $f ]; then
     chmod u+s $f
+  else
+    printf "${RED}Warning:${CLEAR} $f does not exist on the system. Skipping this vuln...\n"
   fi
 }
 
@@ -159,23 +171,32 @@ fakeSudod() {
  
 }
 vimSudo() {
-  if [ -f /usr/bin/vim ]; then
+  f="/usr/bin/vim"
+  if [ -f $f ]; then
     echo "%sudo ALL=(ALL:ALL) NOPASSWD:/usr/bin/vim" >> /etc/sudoers
+  else
+    printf "${RED}Warning:${CLEAR} $f does not exist on the system. Skipping this vuln...\n"
   fi
 }
 sudoUser() {
   echo "joestar ALL=(ALL:ALL) NOPASSWD:ALL" >> /etc/sudoers
 }
 pamCommonAuth() {
-  if [ -f /etc/pam.d/common-auth ]; then
-    sed -ie "s/nullok_secure/nullok/g" /etc/pam.d/common-auth
-    sed -ie "s/pam_rootok.so/pam_permit.so/g" /etc/pam.d/common-auth
-    sed -ie "s/pam_deny.so/pam_permit.so/g" /etc/pam.d/common-auth
+  f="/etc/pam.d/common-auth"
+  if [ -f $f ]; then
+    sed -ie "s/nullok_secure/nullok/g" $f
+    sed -ie "s/pam_rootok.so/pam_permit.so/g" $f
+    sed -ie "s/pam_deny.so/pam_permit.so/g" $f
+  else
+    printf "${RED}Warning:${CLEAR} $f does not exist on the system. Skipping this vuln...\n"
   fi
 }
 pamSu() {
-  if [ -f /etc/pam.d/su ]; then
-    sed -ie "s/pam_rootok.so/pam_permit.so/g" /etc/pam.d/su
+  f="/etc/pam.d/su"
+  if [ -f $f ]; then
+    sed -ie "s/pam_rootok.so/pam_permit.so/g" $f
+  else
+    printf "${RED}Warning:${CLEAR} $f does not exist on the system. Skipping this vuln...\n"
   fi
 }
 pamPermit() {

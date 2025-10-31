@@ -5,4 +5,6 @@ for file in ./*; do
   fi
 done
 cd ..
-./preplant.sh
+while read -r module difficulty vuln; do
+  ./preplant.sh $vuln
+done < currentSet.txt
