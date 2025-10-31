@@ -4,8 +4,10 @@ BOLD="\033[1m"
 RED="\033[31;1m"
 CLEAR="\033[0m"
 
-if [ $# -gt 0 ]; then
-  printf "${RED}Error:${CLEAR} You are supposeed to run this command with no arguments\n${BOLD}Usage:${CLEAR} $0\n" >&2
+if [ $# -eq 1 ]; then
+  :
+else
+  printf "${RED}Error:${CLEAR} You are supposeed to run this command with exactly 1 argument\n${BOLD}Usage:${CLEAR} $0 vulnName\n" >&2
   exit
 fi
 
