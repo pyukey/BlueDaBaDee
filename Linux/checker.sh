@@ -122,18 +122,18 @@ aclShadow() {
   fi
 }
 capCat() {
-  if check "getcap /bin/cat | grep -q cap_dac_override" false "Capabilities allows cat to read any file"; then
+  if check "[ -f /bin/cat ] && getcap /bin/cat | grep -q cap_dac_override" false "Capabilities allows cat to read any file"; then
     correct=$(($correct+1))
   fi
 }
 capVim() {
-  if check "getcap /usr/bin/vim.basic | grep -q cap_dac_override" false "Capabilities allows vim to read any file"; then
+  if check "[ -f /usr/bin/vim.basic ] && getcap /usr/bin/vim.basic | grep -q cap_dac_override" false "Capabilities allows vim to read any file"; then
     correct=$(($correct+1))
   fi
 }
 capLess() {
   lessPath="$(which less)"
-  if check "getcap $lessPath | grep -q cap_dac_override" false "Capabilities allows less to read any file"; then
+  if check "[ -f $lessPath ] && getcap $lessPath | grep -q cap_dac_override" false "Capabilities allows less to read any file"; then
     correct=$(($correct+1))
   fi
 }
@@ -158,7 +158,7 @@ falseSUID() {
   fi
 }
 vimSUID() {
-  if check "ls -l /usr/bin/vim | awk '{print \$1}' | grep -q s" false "/usr/bin/vim has SUID bit set"; then
+  if check "[ -f /usr/bin/vim ] && ls -l /usr/bin/vim | awk '{print \$1}' | grep -q s" false "/usr/bin/vim has SUID bit set"; then
     correct=$(($correct+1))
   fi
 }
