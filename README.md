@@ -7,6 +7,35 @@ To begin, run the following steps in a **Linux-based VM** (we support a large va
 1. `git clone https://github.com/pyukey/BlueDaBaDee.git`
 2. `cd BlueDaBaDee/Linux`
 
+# Windows
+The Windows interface is more straight-forward (yay Powershell), so let's start with that.   
+
+## One command to rule them all
+
+Just run `.\vulns.ps1`. There are a few flags supported:
+
+- `-action plant/check` : Choose whichever action you wish to do. This flag is mandatory, and you will be prompted if you do not provide it.
+- `-modules yourList` : Allows you to specify the specific vulnerabilities, where `yourList` is a comma separated list of either the module or vulnerability names.
+- `-minDifficulty #` : Where `#` is a digit [1-5]. All selected vulnerabilities will have difficulty at least `#` 
+- `-maxDifficulty #` : Where `#` is a digit [1-5]. All selected vulnerabilities will have difficulty no more than `#` 
+
+## Contribute
+
+To add a new vulnerability to the script, you must make 3 additions:
+
+1. Create an object for the vulnerability, specifying its Name, Module, and Difficulty.
+```powershell
+[pscustomobject]@{
+        Name = 'meow1'
+        Module = 'cat'
+        Difficulty = 1
+},
+```
+2. Add the function for planting the vulnerability to the `$plantVulns` array
+3. Add the function for checking the vulnreability to the `$checkVulns` array
+
+# Linux
+
 ## Step 1: Picking Vulns
 
 First you need to tell BlueDaBaDee which vulns you want to practice. This will be stored in a file named `currentSet.txt`. You can see all supported vulnerabilities in `config.txt`, where each line has the following format:
@@ -37,7 +66,7 @@ If you ever want to check your progress, you can run `sudo ./checker.sh` and it 
 
 ![test image](./SPOILER_image.webp)
 
-# Contributing to this repo
+# Linux - Contributing to this repo
 
 Since BlueDaBaDee is modular, it is easy to contribute new vulnerabilities!
 
@@ -75,3 +104,30 @@ This is the exact same as for adding new vulnerabilities. The only reason I'm ex
 #   MODULE NAME   #
 ###################
 ```
+
+Additionally, in the checker you should copy the syntax for a module check:
+
+```bash
+checkGROUP() {
+  numTests=$(grep -c -e "^GROUP " config.txt)
+  printf "${BOLD}GROUP\n===================${CLEAR}\n"
+  correct=0
+
+  while read -r module difficulty func; do
+    $func
+  done < currentSet.GROUP.txt
+
+  if [ "$correct" -eq "$numTests" ]; then
+    printf "\n${GREEN} Total score:${CLEAR} $correct / $numTests\n\n"
+  else
+    printf "\n${RED} Total score:${CLEAR} $correct / $numTests\n\n"
+  fi
+}
+
+if grep -q -e "^GROUP " currentSet.txt; then
+  grep -e "^GROUP " currentSet.txt > currentSet.GROUP.txt
+  checkGROUP
+  rm currentSet.GROUP.txt
+fi
+```
+
