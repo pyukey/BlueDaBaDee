@@ -252,6 +252,31 @@ pamPermit() {
   fi
 }
 
+
+################
+#   SCHEDULE   #
+################
+
+cronJob() {
+  if check "[ -f /etc/cron.d/malicious_cron ]" false "Malicious cron job found in /etc/cron.d/malicious_cron"; then
+    correct=$(($correct+1))
+  fi
+}
+
+anacronJob() {
+  if check "grep -q malicious.job /etc/anacrontab" false "Malicious job found in /etc/anacrontab"; then
+    correct=$(($correct+1))
+  fi
+}
+
+atJob() {
+  # Checks if any jobs are currently scheduled in the queue
+  if check "atq | grep -q ." false "Scheduled 'at' jobs found in queue"; then
+    correct=$(($correct+1))
+  fi
+}
+
+
 ####################
 #   FINAL CHECKS   #
 ####################
@@ -304,6 +329,24 @@ checkSystem() {
   fi
 }  
 
+
+checkSchedule() {
+  numTests=$(grep -c -e "^schedule " currentSet.txt)
+  printf "${BOLD}SCHEDULE\n===================${CLEAR}\n"
+  correct=0
+
+  while read -r module difficulty func; do
+    $func
+  done < currentSet.schedule.txt
+
+  if [ "$correct" -eq "$numTests" ]; then
+    printf "\n${GREEN} Total score:${CLEAR} $correct / $numTests\n\n"
+  else
+    printf "\n${RED} Total score:${CLEAR} $correct / $numTests\n\n"
+  fi
+}
+
+
 if grep -q -e "^user " currentSet.txt; then
   grep -e "^user " currentSet.txt > currentSet.user.txt
   checkUser
@@ -319,3 +362,10 @@ if grep -q -e "^system " currentSet.txt; then
   checkSystem
   rm currentSet.system.txt
 fi
+if grep -q -e "^schedule " currentSet.txt; then
+  grep -e "^schedule " currentSet.txt > currentSet.schedule.txt
+  checkSchedule
+  rm currentSet.schedule.txt
+fi
+
+

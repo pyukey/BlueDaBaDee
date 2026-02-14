@@ -253,4 +253,28 @@ pamPermit() {
   cp -f $pam_path/pam_permit.so $pam_path/pam_deny.so
 }
 
+################
+#   SCHEDULE   #
+################
+
+cronJob() {
+  # Plants a malicious cron job in cron.d
+  echo "* * * * * root /bin/bash -c 'echo pwned > /tmp/cron_pwn'" > /etc/cron.d/malicious_cron
+}
+
+anacronJob() {
+  # Appends a malicious line to anacrontab
+  echo "1 5 malicious.job /bin/bash -c 'echo pwned > /tmp/anacron_pwn'" >> /etc/anacrontab
+}
+
+atJob() {
+  # Schedules a malicious 'at' job if 'at' is installed
+  if command -v at >/dev/null; then
+    echo "touch /tmp/at_pwn" | at now + 24 hours 2>/dev/null
+  else
+    printf "${RED}Warning:${CLEAR} 'at' command not found. Skipping this vuln...\n"
+  fi
+}
+
+
 $1
