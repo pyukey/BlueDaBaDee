@@ -31,3 +31,6 @@ system 1 sudoUser
 system 4 pamCommonAuth
 system 4 pamSu
 system 5 pamPermit
+schedule 3 cronJob
+schedule 3 anacronJob
+schedule 3 atJob
